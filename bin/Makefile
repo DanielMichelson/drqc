@@ -17,44 +17,21 @@
 # along with RAVE.  If not, see <http://www.gnu.org/licenses/>.
 # ------------------------------------------------------------------------
 # 
-# dr_qc Makefile
+# For Lib directory, only install and clean functionality
 # @file
-# @author Daniel Michelson, Environment Canada and Climate Change Canada
-# @date 2019-04-15
+# @author Daniel Michelson, Environment and Climate Change Cananda
+# @date 2019-04-27
 ###########################################################################
-.PHONY: all src modules test doc install
+-include $(RAVEROOT)/rave/mkf/def.mk
 
-all:	src modules
-
-src:
-	$(MAKE) -C src
-
-modules:
-	$(MAKE) -C modules
-
-test:
-	@chmod +x ./tools/test_dr_qc.sh
-	@./tools/test_dr_qc.sh
-
-doc:
-	$(MAKE) -C doxygen doc
-
+.PHONY=install
 install:
-	$(MAKE) -C src install
-	$(MAKE) -C modules install
-	$(MAKE) -C Lib install
-	$(MAKE) -C bin install
-	@sh etc/rave_pgf_quality_registry.sh
+	@cp -v -f ec_drqc "${prefix}/bin/"
 
-.PHONY=clean
-clean:
-	$(MAKE) -C src clean
-	$(MAKE) -C modules clean
-	$(MAKE) -C Lib clean
-	$(MAKE) -C bin clean
-	$(MAKE) -C doxygen clean
+.PHONY:clean
+clean: ;
+	@\rm -f *~
 
-.PHONY=distclean		 
-distclean:	clean
-	$(MAKE) -C src distclean
-	$(MAKE) -C modules distclean
+.PHONY:distclean
+distclean:
+	@\rm -f *~

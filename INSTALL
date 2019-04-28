@@ -7,7 +7,7 @@ dr_qc works with Python 2.6.x and 2.7.x, together with a RAVE installation.
 RAVE and its packages is found at git.baltrad.eu. It will be migrated to
 Python 3.5+.
 
-You must sset the RAVEROOT environment variable. This is the path to the root
+You must set the RAVEROOT environment variable. This is the path to the root
 of your RAVE installation, e.g. /opt/baltrad . The Makefiles are already 
 configured appropriately, and will use the information you used when building 
 RAVE.

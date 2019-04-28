@@ -42,16 +42,17 @@ targsfmt = "param_name=%s zdr_offset=%2.2f kernely=%i kernelx=%i param_thresh=%2
 #  (undetect), and the centre bin in the polar kernel is assigned the class that
 #  is in majority. If that class is "precipitation", then the original radar 
 #  observable is kept, otherwise it is assigned the "undetect" value.
-# @param PolarVolumeCore or PolarScanCore object
+# @param PolarScanCore object
 # @param string radar quantity name, defaults to DBZH
-# @param Float ZDR offset in dB
+# @param Float ZDR offset in dB. Defaults to 0.0.
 # @param int number of polar azimuth rays around the centre bin in the kernel 
-# used with the speckle filter
+# used with the speckle filter. Defaults to 2.
 # @param int number of polar range bins around the centre bin in the kernel 
-# used with the speckle filter
+# used with the speckle filter. Defaults to 2.
 # @param Float threshold above which the radar quantity will not be touched. 
 # Defaults to 35 assuming the quantity is dBZ.
-# @param Float threshold below which DR is considered to represent precipitation
+# @param Float threshold below which DR is considered to represent 
+# precipitation. Defaults to -12 dB.
 # @param boolean whether (True) or not (False) to keep the derived DR parameter
 def drQCscan(scan, param_name="DBZH", zdr_offset=0.0, kernely=2, kernelx=2, 
              param_thresh=35.0, dr_thresh=-12.0, keepDR=True):
@@ -84,16 +85,16 @@ def drQCscan(scan, param_name="DBZH", zdr_offset=0.0, kernely=2, kernelx=2,
 #  sent to the same function individually.
 # @param PolarVolumeCore or PolarScanCore object
 # @param string radar quantity name, defaults to DBZH
-# @param Float ZDR offset in dB
+# @param Float ZDR offset in dB. Defaults to 0.0.
 # @param int number of polar azimuth rays around the centre bin in the kernel 
-# used with the speckle filter
+# used with the speckle filter. Defaults to 2.
 # @param int number of polar range bins around the centre bin in the kernel 
-# used with the speckle filter
+# used with the speckle filter. Defaults to 2.
 # @param Float threshold above which the radar quantity will not be touched. 
 # Defaults to 35 assuming the quantity is dBZ.
-# @param Float threshold below which DR is considered to represent precipitation
+# @param Float threshold below which DR is considered to represent 
+# precipitation. Defaults to -12 dB.
 # @param boolean whether (True) or not (False) to keep the derived DR parameter
-# @returns 
 def drQC(pobject, param_name="DBZH", zdr_offset=0.0, kernely=2, kernelx=2, 
          param_thresh=35.0, dr_thresh=-12.0, keepDR=True):
 
