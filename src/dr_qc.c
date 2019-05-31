@@ -44,6 +44,7 @@ int drDeriveParameter(PolarScan_t *scan, double zdr_offset) {
   PolarScanParam_t *DR = NULL;
 
   int nrays, nbins, ray, bin;
+  double scaled;
 
   if ( (PolarScan_hasParameter(scan, "ZDR")) && 
        (PolarScan_hasParameter(scan, "RHOHV")) ) {
@@ -57,23 +58,42 @@ int drDeriveParameter(PolarScan_t *scan, double zdr_offset) {
     DR = RAVE_OBJECT_NEW(&PolarScanParam_TYPE);
     PolarScanParam_setGain(DR, DR_GAIN);
     PolarScanParam_setOffset(DR, DR_OFFSET);
-    PolarScanParam_setNodata(DR, DR_NODATA);
-    PolarScanParam_setUndetect(DR, DR_UNDETECT);
+    scaled = (DR_NODATA - DR_OFFSET) / DR_GAIN;
+    PolarScanParam_setNodata(DR, scaled);
+    scaled = (DR_UNDETECT - DR_OFFSET) / DR_GAIN;
+    PolarScanParam_setUndetect(DR, scaled);
     PolarScanParam_setQuantity(DR, "DR");
     PolarScanParam_createData(DR, (long)nbins, (long)nrays, RaveDataType_UCHAR);
 
     for (ray=0; ray<nrays; ray++) {
       for (bin=0; bin<nbins; bin++) {
-	double ZDRval, RHOHVval, DRdb, scaled;
+	double ZDRval, RHOHVval;
+	double DRdb = 0.0;
 	RaveValueType ZDRvtype, RHOHVvtype;
 	ZDRvtype = PolarScanParam_getConvertedValue(ZDR, bin, ray, &ZDRval);
 	RHOHVvtype = PolarScanParam_getConvertedValue(RHOHV, bin, ray, &RHOHVval);
+	/* Normally, we expect that parameters match up, but we know there are
+	   cases where they don't, so we have to manage such situations. */
+
+	/* Valid ZDR and RHOHV */
 	if ( (ZDRvtype == RaveValueType_DATA) && 
 	     (RHOHVvtype == RaveValueType_DATA) ) {
 	  DRdb = drCalculate(ZDRval, RHOHVval, zdr_offset);
-	  scaled = (DRdb - DR_OFFSET) / DR_GAIN;
-	  PolarScanParam_setValue(DR, bin, ray, round(scaled));
-	}  /* Will default to 0 if UNDETECT */
+	} else if 
+	   /* No ZDR but valid RHOHV, assume DR_THRESH */
+	   ( (ZDRvtype == RaveValueType_UNDETECT) && 
+	     (RHOHVvtype == RaveValueType_DATA) ) {
+	  DRdb = DR_THRESH;
+	} else if 
+	   /* Valid ZDR but no RHOHV, cannot do anything meaningful */
+	   ( (ZDRvtype == RaveValueType_DATA) && 
+	     (RHOHVvtype == RaveValueType_UNDETECT) ) {
+	  DRdb = DR_NODATA;
+	} else {
+	  DRdb = DR_UNDETECT;
+	}
+	scaled = (DRdb - DR_OFFSET) / DR_GAIN;
+	PolarScanParam_setValue(DR, bin, ray, round(scaled));
       }
     }
     PolarScan_addParameter(scan, DR);  /* Add DR to the scan */
@@ -142,6 +162,13 @@ int drSpeckleFilter(PolarScan_t *scan, char* param_name, int kernelx, int kernel
 		} else if ( (pv<param_thresh) && (drv>dr_thresh) ) {
 		  c += 1;  /* nonmet */
 		}
+
+	      /* Count as valid weather cases where DR could not be determined */
+	      } else if ( (pType == RaveValueType_DATA) && 
+			  (drType == RaveValueType_NODATA) ) {
+		w += 1;
+
+	      /* Can only be undetect */
 	      } else if (pType == RaveValueType_UNDETECT) {
 		/* no echo, only if param==UNDETECT
 		   There will be cases where DR==UNDETECT, that should be 
@@ -153,17 +180,18 @@ int drSpeckleFilter(PolarScan_t *scan, char* param_name, int kernelx, int kernel
 	}
       }
       n = w + c + u;
-      double nonmet = (double)c / (double)n;
-      double wx = (double)w / (double)n;
-      double mostly_clear = (double)u / (double)n;
+      if (n) {
+	double nonmet = (double)c / (double)n;
+	double wx = (double)w / (double)n;
+	double mostly_clear = (double)u / (double)n;
 
-      if ( (nonmet > wx) || (mostly_clear > wx) ) {
-	pType = PolarScanParam_getConvertedValue(param, bin, ray, &pv);
-	if (pType == RaveValueType_DATA) {
-	  PolarScanParam_setValue(param, bin, ray, undetect);
+	if ( (nonmet > wx) || (mostly_clear > wx) ) {
+	  pType = PolarScanParam_getConvertedValue(param, bin, ray, &pv);
+	  if (pType == RaveValueType_DATA) {
+	    PolarScanParam_setValue(param, bin, ray, undetect);
+	  }
 	}
       }
-
     }
   }
   RAVE_OBJECT_RELEASE(param);

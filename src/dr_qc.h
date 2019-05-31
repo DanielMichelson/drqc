@@ -31,11 +31,13 @@ along with RAVE.  If not, see <http://www.gnu.org/licenses/>.
 #include "polarscanparam.h"
 #define MY_ABS(x)    ((x) < 0 ? -(x) : (x))
 #define MY_MIN(a, b) ((a) < (b) ? (a) : (b))
-#define MAX_RHOHV 0.999     /* RHOHV must be <1 to avoid blowing up DR */
+#define MAX_RHOHV 0.999   /* RHOHV must be <1 to avoid blowing up DR */
+#define MIN_RHOHV 0.8813  /* Value of RHOHV giving -12 dB DR with 0 dB ZDR */
 #define DR_OFFSET -33.13757158016619  /* Best DR -one step with MAX_RHOHV */
 #define DR_GAIN 0.12995126109869093
-#define DR_UNDETECT 0.0     /* undetect depolarization value */
-#define DR_NODATA DR_OFFSET /* bogus nodata depolarization value */
+#define DR_UNDETECT DR_OFFSET  /* undetect depolarization value */
+#define DR_NODATA 0.0          /* bogus nodata depolarization value */
+#define DR_THRESH -12.0  /* Default DR threshold */
 
 
 /**
