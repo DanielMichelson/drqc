@@ -72,12 +72,12 @@ int drDeriveParameter(PolarScan_t *scan, double zdr_offset);
  * of these categories wins and the centre bin is filtered accordingly.
  * @param[in] pointer to a PolarScan_t object containing ZDR and RHOHV.
  * @param[in] pointer to a string containing the parameter to filter (DBZH).
- * @param[in] int number of polar range bins around the centre bin in the kernel used with the speckle filter (2).
+ * @param[in] int number of polar azimuth rays around the centre bin in the kernel used with the speckle filter (2).
  * @param[in] int number of polar range bins around the centre bin in the kernel used with the speckle filter (2).
  * @param[in] double threshold above which the radar quantity will not be touched. Defaults to 35 assuming the quantity is dBZ.
  * @param[in] double threshold below which DR is considered to represent precipitation (-12 dB).
  * @return int 1 upon success, otherwise 0
  */
-int drSpeckleFilter(PolarScan_t *scan, char* param_name, int kernelx, int kernely, double dbz_thresh, double dr_thresh);
+int drSpeckleFilter(PolarScan_t *scan, char* param_name, int kernely, int kernelx, double dbz_thresh, double dr_thresh);
 
 #endif

@@ -80,10 +80,13 @@ int drDeriveParameter(PolarScan_t *scan, double zdr_offset) {
 	     (RHOHVvtype == RaveValueType_DATA) ) {
 	  DRdb = drCalculate(ZDRval, RHOHVval, zdr_offset);
 	} else if 
-	   /* No ZDR but valid RHOHV, assume DR_THRESH */
+	   /* No ZDR but valid RHOHV, assume ZDR==0 when calculating DR.
+	      It is preferable to threshold RHOHV only, but we can't represent
+	      the result rationally with the DR parameter. The likelihood of it 
+	      happening should be minimal, so we won't make the effort. */
 	   ( (ZDRvtype == RaveValueType_UNDETECT) && 
 	     (RHOHVvtype == RaveValueType_DATA) ) {
-	  DRdb = DR_THRESH;
+	  DRdb = drCalculate(0.0, RHOHVval, zdr_offset);
 	} else if 
 	   /* Valid ZDR but no RHOHV, cannot do anything meaningful */
 	   ( (ZDRvtype == RaveValueType_DATA) && 
@@ -109,8 +112,8 @@ int drDeriveParameter(PolarScan_t *scan, double zdr_offset) {
 }
 
 
-int drSpeckleFilter(PolarScan_t *scan, char* param_name, int kernelx, int kernely, double param_thresh, double dr_thresh) {
-  PolarScanParam_t *param, *DR;
+int drSpeckleFilter(PolarScan_t *scan, char* param_name, int kernely, int kernelx, double param_thresh, double dr_thresh) {
+  PolarScanParam_t *param, *DR, *cloned;
   int nrays, nbins, ray, bin;  /* dimensions and iterators */
   int n, c, w, u, y, Y, x, X;  /* more iterators and counters */
   double undetect;
@@ -122,7 +125,8 @@ int drSpeckleFilter(PolarScan_t *scan, char* param_name, int kernelx, int kernel
     return 0;
   }
 
-  param = PolarScan_getParameter(scan, param_name);
+  param = PolarScan_removeParameter(scan, param_name);
+  cloned = RAVE_OBJECT_CLONE(param);
   DR = PolarScan_getParameter(scan, "DR");
   nrays = (int)PolarScan_getNrays(scan);
   nbins = (int)PolarScan_getNbins(scan);
@@ -188,13 +192,15 @@ int drSpeckleFilter(PolarScan_t *scan, char* param_name, int kernelx, int kernel
 	if ( (nonmet > wx) || (mostly_clear > wx) ) {
 	  pType = PolarScanParam_getConvertedValue(param, bin, ray, &pv);
 	  if (pType == RaveValueType_DATA) {
-	    PolarScanParam_setValue(param, bin, ray, undetect);
+	    PolarScanParam_setValue(cloned, bin, ray, undetect);
 	  }
 	}
       }
     }
   }
+  PolarScan_addParameter(scan, cloned);
   RAVE_OBJECT_RELEASE(param);
+  RAVE_OBJECT_RELEASE(cloned);
   RAVE_OBJECT_RELEASE(DR);
 
   return 1;

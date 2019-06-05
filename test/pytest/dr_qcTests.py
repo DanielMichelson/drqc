@@ -74,11 +74,11 @@ class dr_qcTest(unittest.TestCase):
     def test_drSpeckleFilter_noParam(self):
         zdr_offset = 0.0
         param_name, param_thresh, dr_thresh = "DBZH", 35.0, -12.0
-        kernelx = kernely = 2
+        kernely = kernelx = 3
         rio = _raveio.open(self.FIXTURE)
         scan = rio.object
         try:
-            _dr_qc.drSpeckleFilter(scan, param_name, kernelx, kernely, 
+            _dr_qc.drSpeckleFilter(scan, param_name, kernely, kernelx, 
                                    param_thresh, dr_thresh)
         except AttributeError:
             pass
@@ -86,10 +86,10 @@ class dr_qcTest(unittest.TestCase):
     def test_drSpeckleFilter(self):
         zdr_offset = 0.0
         param_name, param_thresh, dr_thresh = "DBZH", 35.0, -12.0
-        kernelx = kernely = 2
+        kernely = kernelx = 3
         rio = _raveio.open(self.DR_DERIVE_PARAMETER_FIXTURE)
         scan = rio.object
-        _dr_qc.drSpeckleFilter(scan, param_name, kernelx, kernely, 
+        _dr_qc.drSpeckleFilter(scan, param_name, kernely, kernelx,
                                param_thresh, dr_thresh)
         #rio.save(self.DR_SPECKLE_FILTER_FIXTURE)
         refio = _raveio.open(self.DR_SPECKLE_FILTER_FIXTURE)
@@ -100,14 +100,14 @@ class dr_qcTest(unittest.TestCase):
     def test_drQC(self):
         rio = _raveio.open(self.FIXTURE)
         scan = rio.object
-        ec_drqc.drQC(scan)
+        ec_drqc.drQC(scan, kernely=3, kernelx=3)
         refio = _raveio.open(self.DR_SPECKLE_FILTER_FIXTURE)
         ref_scan = refio.object
         status = different(scan, ref_scan, "DBZH")
         self.assertFalse(status)
         param = scan.getParameter("DR")
         self.assertEquals(ec_drqc.TASK, param.getAttribute("how/task"))
-        self.assertEquals("param_name=DBZH zdr_offset=0.00 kernely=2 kernelx=2 param_thresh=35.0 dr_thresh=-12.0", param.getAttribute("how/task_args"))
+        self.assertEquals("param_name=DBZH zdr_offset=0.00 kernely=3 kernelx=3 param_thresh=35.0 dr_thresh=-12.0", param.getAttribute("how/task_args"))
 
 
 # Helper function to determine whether two parameter arrays differ

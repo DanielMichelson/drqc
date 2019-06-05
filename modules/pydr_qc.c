@@ -116,10 +116,10 @@ static PyObject* _drSpeckleFilter_func(PyObject* self, PyObject* args) {
   PyObject* object = NULL;
   PyPolarScan* pyscan = NULL;
   char *param_name;
-  int kernelx, kernely;
+  int kernely, kernelx;
   double param_thresh, dr_thresh;
 
-  if (!PyArg_ParseTuple(args, "Osiidd", &object, &param_name, &kernelx, &kernely, &param_thresh, &dr_thresh)) {
+  if (!PyArg_ParseTuple(args, "Osiidd", &object, &param_name, &kernely, &kernelx, &param_thresh, &dr_thresh)) {
     return NULL;
   }
 
@@ -129,7 +129,7 @@ static PyObject* _drSpeckleFilter_func(PyObject* self, PyObject* args) {
     raiseException_returnNULL(PyExc_AttributeError, "DR speckle filter requires scan as input");
   }
 
-  if (!drSpeckleFilter(pyscan->scan, param_name, kernelx, kernely, param_thresh, dr_thresh)) {
+  if (!drSpeckleFilter(pyscan->scan, param_name, kernely, kernelx, param_thresh, dr_thresh)) {
     raiseException_returnNULL(PyExc_AttributeError, "DR speckle filter requires parameter (most likely DBZH) and depolarization ratio (DR)");
   }
 

@@ -72,7 +72,7 @@ def drQCscan(scan, param_name="DBZH", zdr_offset=0.0, kernely=2, kernelx=2,
 
     # Then speckle filter the parameter with it
     try:
-        _dr_qc.drSpeckleFilter(scan, param_name, kernelx, kernely, 
+        _dr_qc.drSpeckleFilter(scan, param_name, kernely, kernelx, 
                                param_thresh, dr_thresh)
     except AttributeError:
         pass
