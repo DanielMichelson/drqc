@@ -84,7 +84,7 @@ if __name__=="__main__":
     (options, args) = parser.parse_args()
 
     if not options.ifile or not options.ofile:
-        print usage
+        parser.print_help()
         sys.exit()
         
     
