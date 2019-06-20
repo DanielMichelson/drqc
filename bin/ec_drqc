@@ -65,10 +65,10 @@ if __name__=="__main__":
                       help="ZDR offset in dB. Defaults to 0.0")
 
     parser.add_option("-y", "--kernely", dest="kernely", type="int", default=2,
-                      help="Number of rays in each direction around the centre bin used for the speckle filter kernel.")
+                      help="Number of rays in each direction around the centre bin used for the speckle filter kernel. Defaults to 2.")
 
     parser.add_option("-x", "--kernelx", dest="kernelx", type="int", default=2,
-                      help="Number of bins in each direction around the centre bin used for the speckle filter kernel.")
+                      help="Number of range bins in each direction around the centre bin used for the speckle filter kernel. Defaults to 2.")
 
     parser.add_option("-t", "--param_thresh", dest="param_thresh", type="float",
                       default=35.0,
